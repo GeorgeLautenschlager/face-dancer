@@ -9,6 +9,7 @@ region, keeping the model off the write path at runtime, not just in tests.
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Generic, Protocol, TypeVar
 
@@ -65,8 +66,13 @@ class Disposer(Protocol[P_contra, R_co]):
     def __call__(self, payload: P_contra) -> R_co: ...
 
 
-def dispose(proposal: Proposal[P], disposer: Disposer[P, R]) -> Applied[R]:
-    """Run the code-side disposer on a proposal inside a model-free region."""
+def dispose(proposal: Proposal[P], disposer: Callable[[P], R]) -> Applied[R]:
+    """Run the code-side disposer on a proposal inside a model-free region.
+
+    Accepts any callable; Disposer is the named interface for class-based
+    disposers. (Annotated as Callable because mypy cannot infer R through
+    a generic Protocol parameter.)
+    """
     with model_calls_forbidden(f"disposing proposal from {proposal.origin!r}"):
         result = disposer(proposal.payload)
     return Applied(result, _MINT_TOKEN)
