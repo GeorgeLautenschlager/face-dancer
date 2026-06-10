@@ -24,6 +24,9 @@ class MembraneViolation(RuntimeError):
     """Something other than dispose() tried to mint an Applied."""
 
 
+# A single underscore is a convention, not an enforcement mechanism — a
+# determined caller can still import this. Accepted tradeoff: the guard
+# stops accidental forgery, not adversarial Python.
 _MINT_TOKEN = object()
 
 
@@ -41,6 +44,12 @@ class Applied(Generic[R]):
 
     result: R
     _token: object = field(default=None, repr=False)
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        raise TypeError(
+            f"{cls.__name__}: Applied may not be subclassed; "
+            "its constructor guard must not be overridable"
+        )
 
     def __post_init__(self) -> None:
         if self._token is not _MINT_TOKEN:

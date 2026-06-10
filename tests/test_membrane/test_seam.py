@@ -2,7 +2,12 @@
 
 import pytest
 
-from face_dancer.membrane.instrumentation import ModelCallForbidden, NullModelGateway
+from face_dancer.membrane.instrumentation import (
+    ModelCall,
+    ModelCallForbidden,
+    NullModelGateway,
+    recorded_model_calls,
+)
 from face_dancer.membrane.seam import Applied, MembraneViolation, Proposal, dispose
 
 
@@ -40,3 +45,25 @@ def test_dispose_is_a_model_free_region() -> None:
 
     with pytest.raises(ModelCallForbidden):
         dispose(proposal, disposer_that_cheats)
+
+
+def test_dispose_propagates_disposer_errors_and_resets_the_region() -> None:
+    proposal = Proposal(payload=1, origin="model")
+
+    def exploding(payload: int) -> int:
+        raise ValueError("boom")
+
+    with pytest.raises(ValueError, match="boom"):
+        dispose(proposal, exploding)
+    # the forbidden region must not leak: model calls record normally again
+    with recorded_model_calls() as rec:
+        NullModelGateway().invoke("after.failure", None)
+    assert rec.calls == [ModelCall(path="after.failure")]
+
+
+def test_applied_cannot_be_subclassed() -> None:
+    with pytest.raises(TypeError, match="may not be subclassed"):
+
+        class SneakyApplied(Applied):  # type: ignore[type-arg]
+            def __post_init__(self) -> None:
+                pass
