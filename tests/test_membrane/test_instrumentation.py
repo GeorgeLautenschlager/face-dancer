@@ -52,3 +52,13 @@ def test_nested_recorders_stay_isolated() -> None:
         record_model_call("outer.path")
     assert inner.calls == [ModelCall(path="inner.path")]
     assert outer.calls == [ModelCall(path="outer.path")]
+
+
+def test_forbidden_inside_recorder_raises_and_does_not_record() -> None:
+    with (
+        recorded_model_calls() as rec,
+        model_calls_forbidden("inner block"),
+        pytest.raises(ModelCallForbidden),
+    ):
+        record_model_call("some.path")
+    assert rec.calls == []

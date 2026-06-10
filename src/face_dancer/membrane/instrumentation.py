@@ -50,6 +50,8 @@ def record_model_call(path: str) -> None:
     Raises ModelCallForbidden inside a forbidden region; otherwise appends to
     the active recorder, if any. A no-op when neither is in effect.
     """
+    # forbidden takes priority over recording: a guarded region must raise,
+    # never silently record, even when a recorder is active
     reason = _forbidden_reason.get()
     if reason is not None:
         raise ModelCallForbidden(reason, path)
