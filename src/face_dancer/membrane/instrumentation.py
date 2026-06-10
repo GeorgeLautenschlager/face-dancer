@@ -7,10 +7,12 @@ the recorder is empty to prove the model stayed off that path (brief AC5).
 
 from __future__ import annotations
 
+from abc import ABC, abstractmethod
 from collections.abc import Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+from typing import final
 
 
 class ModelCallForbidden(RuntimeError):
@@ -79,3 +81,29 @@ def model_calls_forbidden(reason: str) -> Iterator[None]:
         yield
     finally:
         _forbidden_reason.reset(token)
+
+
+class ModelGateway(ABC):
+    """The single seam every model invocation must pass through.
+
+    invoke() is final so a concrete adapter cannot forget to record; adapters
+    implement only _invoke(). The real adapter is deferred (brief non-goal).
+    """
+
+    @final
+    def invoke(self, path: str, request: object) -> object:
+        record_model_call(path)
+        return self._invoke(request)
+
+    @abstractmethod
+    def _invoke(self, request: object) -> object: ...
+
+
+class NullModelGateway(ModelGateway):
+    """Test double: records like a real gateway, returns a canned response."""
+
+    def __init__(self, response: object = None) -> None:
+        self._response = response
+
+    def _invoke(self, request: object) -> object:
+        return self._response

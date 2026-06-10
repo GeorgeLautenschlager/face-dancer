@@ -5,6 +5,7 @@ import pytest
 from face_dancer.membrane.instrumentation import (
     ModelCall,
     ModelCallForbidden,
+    NullModelGateway,
     model_calls_forbidden,
     record_model_call,
     recorded_model_calls,
@@ -62,3 +63,17 @@ def test_forbidden_inside_recorder_raises_and_does_not_record() -> None:
     ):
         record_model_call("some.path")
     assert rec.calls == []
+
+
+def test_gateway_invoke_records_and_returns_canned_response() -> None:
+    gateway = NullModelGateway(response="canned")
+    with recorded_model_calls() as rec:
+        result = gateway.invoke("decision.expressive", {"prompt": "hi"})
+    assert result == "canned"
+    assert rec.calls == [ModelCall(path="decision.expressive")]
+
+
+def test_gateway_invoke_raises_inside_forbidden_region() -> None:
+    gateway = NullModelGateway()
+    with model_calls_forbidden("no model on this path"), pytest.raises(ModelCallForbidden):
+        gateway.invoke("state.write", None)
