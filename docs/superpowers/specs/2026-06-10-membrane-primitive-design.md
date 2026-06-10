@@ -54,7 +54,7 @@ class Applied(Generic[R]):
 class Disposer(Protocol[P, R]):
     def __call__(self, payload: P) -> R: ...
 
-def dispose(proposal: Proposal[P], disposer: Disposer[P, R]) -> Applied[R]: ...
+def dispose(proposal: Proposal[P], disposer: Callable[[P], R]) -> Applied[R]: ...
 ```
 
 Three properties carry the invariant:
@@ -64,6 +64,8 @@ Three properties carry the invariant:
 3. **Disposal is a model-free region.** `dispose()` runs the disposer inside `model_calls_forbidden()`. Any model-gateway invocation in the disposer's dynamic extent raises `ModelCallForbidden`.
 
 `origin` is a plain string, not an enum — subsystems that specialize the seam own their own vocabulary; the membrane just preserves provenance.
+
+`dispose` is annotated with `Callable[[P], R]` rather than `Disposer` because mypy cannot infer the result type through a generic Protocol parameter; `Disposer` remains the named interface that class-based disposers implement.
 
 ## The epistemic scope filter (`scope.py`)
 

@@ -6,6 +6,7 @@ SUBMODULES = [
     "face_dancer",
     "face_dancer.protocol",
     "face_dancer.bundle",
+    "face_dancer.membrane",
     "face_dancer.state",
     "face_dancer.rider",
     "face_dancer.resolution",
