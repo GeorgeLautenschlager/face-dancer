@@ -1,6 +1,6 @@
 """Model-call instrumentation: contextvar-scoped recording and forbidden regions.
 
-Every model invocation in Face Dancer must pass through a ModelGateway (Task 2),
+Every model invocation in Face Dancer must pass through a ModelGateway,
 which reports here. Tests wrap a code path in recorded_model_calls() and assert
 the recorder is empty to prove the model stayed off that path (brief AC5).
 """
