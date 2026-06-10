@@ -86,9 +86,19 @@ def model_calls_forbidden(reason: str) -> Iterator[None]:
 class ModelGateway(ABC):
     """The single seam every model invocation must pass through.
 
-    invoke() is final so a concrete adapter cannot forget to record; adapters
-    implement only _invoke(). The real adapter is deferred (brief non-goal).
+    invoke() records then delegates; adapters implement only _invoke(), so
+    recording cannot be forgotten. Overriding invoke() raises TypeError at
+    class-definition time (and is additionally flagged by mypy via @final).
+    The real adapter is deferred (brief non-goal).
     """
+
+    def __init_subclass__(cls, **kwargs: object) -> None:
+        super().__init_subclass__(**kwargs)
+        if "invoke" in cls.__dict__:
+            raise TypeError(
+                f"{cls.__name__} may not override ModelGateway.invoke(); "
+                "implement _invoke() instead"
+            )
 
     @final
     def invoke(self, path: str, request: object) -> object:

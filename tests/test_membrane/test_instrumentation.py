@@ -5,6 +5,7 @@ import pytest
 from face_dancer.membrane.instrumentation import (
     ModelCall,
     ModelCallForbidden,
+    ModelGateway,
     NullModelGateway,
     model_calls_forbidden,
     record_model_call,
@@ -77,3 +78,27 @@ def test_gateway_invoke_raises_inside_forbidden_region() -> None:
     gateway = NullModelGateway()
     with model_calls_forbidden("no model on this path"), pytest.raises(ModelCallForbidden):
         gateway.invoke("state.write", None)
+
+
+def test_model_gateway_is_abstract() -> None:
+    with pytest.raises(TypeError):
+        ModelGateway()  # type: ignore[abstract]
+
+
+def test_model_gateway_subclass_without_invoke_impl_raises_on_instantiation() -> None:
+    class IncompleteGateway(ModelGateway):
+        pass
+
+    with pytest.raises(TypeError):
+        IncompleteGateway()  # type: ignore[abstract]
+
+
+def test_model_gateway_subclass_overriding_invoke_raises_at_definition() -> None:
+    with pytest.raises(TypeError, match="may not override"):
+
+        class CheatingGateway(ModelGateway):
+            def invoke(self, path: str, request: object) -> object:
+                return None
+
+            def _invoke(self, request: object) -> object:
+                return None
