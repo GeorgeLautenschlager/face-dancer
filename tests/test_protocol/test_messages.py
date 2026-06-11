@@ -20,10 +20,18 @@ from face_dancer.protocol.version import SCHEMA_VERSION
 def _one_of_each() -> list[Any]:
     cid = uuid4()
     return [
-        ProposeDelta(correlation_id=cid, target="self", tags=frozenset({"fire"}),
-                     effects=[{"op": "reduce", "amount": 8}]),
-        ApplyDelta(correlation_id=cid, target="self", tags=frozenset({"fire"}),
-                   effects=[{"op": "reduce", "amount": 4}]),
+        ProposeDelta(
+            correlation_id=cid,
+            target="self",
+            tags=frozenset({"fire"}),
+            effects=[{"op": "reduce", "amount": 8}],
+        ),
+        ApplyDelta(
+            correlation_id=cid,
+            target="self",
+            tags=frozenset({"fire"}),
+            effects=[{"op": "reduce", "amount": 4}],
+        ),
         Contest(correlation_id=cid, claims=["I have fire resistance and a save"]),
         Intent(correlation_id=uuid4(), action="I drink the potion"),
         RequestRoll(correlation_id=cid, kind="saving_throw", dc=15),
@@ -57,5 +65,10 @@ def test_schema_version_defaults_to_current() -> None:
 
 def test_message_types_registry_has_all_six() -> None:
     assert set(MESSAGE_TYPES) == {
-        ProposeDelta, ApplyDelta, Contest, Intent, RequestRoll, RollResult
+        ProposeDelta,
+        ApplyDelta,
+        Contest,
+        Intent,
+        RequestRoll,
+        RollResult,
     }
