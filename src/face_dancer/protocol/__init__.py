@@ -4,6 +4,7 @@ Messages: propose_delta, contest, apply_delta, intent, request_roll, roll_result
 Markdown/YAML are renders of this data, never the source of truth.
 """
 
+from face_dancer.protocol.delta import Delta
 from face_dancer.protocol.envelope import Envelope
 from face_dancer.protocol.errors import (
     ProtocolError,
@@ -37,6 +38,7 @@ __all__ = [
     "STARTER_TAGS",
     "ApplyDelta",
     "Contest",
+    "Delta",
     "EffectOp",
     "Envelope",
     "Intent",

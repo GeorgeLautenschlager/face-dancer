@@ -24,31 +24,13 @@
           "title": "Correlation Id",
           "type": "string"
         },
-        "target": {
-          "title": "Target",
-          "type": "string"
-        },
-        "tags": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Tags",
-          "type": "array",
-          "uniqueItems": true
-        },
-        "effects": {
-          "items": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "title": "Effects",
-          "type": "array"
+        "delta": {
+          "$ref": "#/$defs/Delta"
         }
       },
       "required": [
         "correlation_id",
-        "target"
+        "delta"
       ],
       "title": "ApplyDelta",
       "type": "object"
@@ -90,6 +72,46 @@
       ],
       "title": "Contest",
       "type": "object"
+    },
+    "Delta": {
+      "description": "One effect: a single op, the tag-set it applies under, and its payload.",
+      "properties": {
+        "op": {
+          "$ref": "#/$defs/EffectOp"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "required": [
+        "op"
+      ],
+      "title": "Delta",
+      "type": "object"
+    },
+    "EffectOp": {
+      "description": "The closed, versioned set of effect operations a delta may carry.",
+      "enum": [
+        "reduce",
+        "scale",
+        "negate",
+        "grant_save",
+        "modify_roll",
+        "replace"
+      ],
+      "title": "EffectOp",
+      "type": "string"
     },
     "Intent": {
       "description": "Character-side opener; the session adjudicates it into a propose_delta.",
@@ -151,31 +173,13 @@
           "title": "Correlation Id",
           "type": "string"
         },
-        "target": {
-          "title": "Target",
-          "type": "string"
-        },
-        "tags": {
-          "default": [],
-          "items": {
-            "type": "string"
-          },
-          "title": "Tags",
-          "type": "array",
-          "uniqueItems": true
-        },
-        "effects": {
-          "items": {
-            "additionalProperties": true,
-            "type": "object"
-          },
-          "title": "Effects",
-          "type": "array"
+        "delta": {
+          "$ref": "#/$defs/Delta"
         }
       },
       "required": [
         "correlation_id",
-        "target"
+        "delta"
       ],
       "title": "ProposeDelta",
       "type": "object"

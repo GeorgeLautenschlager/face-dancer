@@ -5,10 +5,11 @@ type means adding its class and listing it in ``Message``; ``MESSAGE_TYPES`` is
 derived from the union so it can never drift.
 """
 
-from typing import Annotated, Any, Literal, get_args
+from typing import Annotated, Literal, get_args
 
 from pydantic import Field
 
+from face_dancer.protocol.delta import Delta
 from face_dancer.protocol.envelope import Envelope
 
 
@@ -16,9 +17,7 @@ class ProposeDelta(Envelope):
     """Session-proposed change, not yet committed (session -> character)."""
 
     type: Literal["propose_delta"] = "propose_delta"
-    target: str
-    tags: frozenset[str] = frozenset()
-    effects: list[dict[str, Any]] = Field(default_factory=list)
+    delta: Delta
 
 
 class ApplyDelta(Envelope):
@@ -28,9 +27,7 @@ class ApplyDelta(Envelope):
     """
 
     type: Literal["apply_delta"] = "apply_delta"
-    target: str
-    tags: frozenset[str] = frozenset()
-    effects: list[dict[str, Any]] = Field(default_factory=list)
+    delta: Delta
 
 
 class Contest(Envelope):
