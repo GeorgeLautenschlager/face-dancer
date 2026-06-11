@@ -4,6 +4,7 @@ from uuid import uuid4
 
 import pytest
 
+from face_dancer.protocol.delta import Delta
 from face_dancer.protocol.errors import (
     ProtocolError,
     SchemaVersionError,
@@ -19,6 +20,7 @@ from face_dancer.protocol.messages import (
 )
 from face_dancer.protocol.validation import validate
 from face_dancer.protocol.version import SCHEMA_VERSION
+from face_dancer.protocol.vocabulary import EffectOp
 
 
 def test_schema_version_is_a_positive_int() -> None:
@@ -32,7 +34,7 @@ def test_error_hierarchy() -> None:
 
 
 def test_validate_dispatches_on_discriminator() -> None:
-    msg = ProposeDelta(correlation_id=uuid4(), target="self")
+    msg = ProposeDelta(correlation_id=uuid4(), delta=Delta(op=EffectOp.REDUCE))
     parsed = validate(msg.model_dump())
     assert isinstance(parsed, ProposeDelta)
     assert parsed == msg
@@ -86,8 +88,11 @@ def test_validate_rejects_non_dict_json() -> None:
 @pytest.mark.parametrize(
     "msg",
     [
-        ProposeDelta(correlation_id=uuid4(), target="self", tags=frozenset({"fire"})),
-        ApplyDelta(correlation_id=uuid4(), target="self"),
+        ProposeDelta(
+            correlation_id=uuid4(),
+            delta=Delta(op=EffectOp.REDUCE, tags=frozenset({"fire"})),
+        ),
+        ApplyDelta(correlation_id=uuid4(), delta=Delta(op=EffectOp.REDUCE)),
         Contest(correlation_id=uuid4(), claims=["I have fire resistance"]),
         Intent(correlation_id=uuid4(), action="I drink the potion"),
         RequestRoll(correlation_id=uuid4(), kind="saving_throw", dc=15),
@@ -97,3 +102,14 @@ def test_validate_rejects_non_dict_json() -> None:
 def test_validate_round_trips_every_message_type(msg) -> None:
     assert validate(msg.model_dump()) == msg
     assert validate(msg.model_dump_json()) == msg
+
+
+def test_validate_rejects_unknown_delta_op() -> None:
+    # delta.op must be a known EffectOp; an unknown op is a body error.
+    raw = {
+        "type": "propose_delta",
+        "correlation_id": str(uuid4()),
+        "delta": {"op": "teleport"},
+    }
+    with pytest.raises(ProtocolError):
+        validate(raw)
