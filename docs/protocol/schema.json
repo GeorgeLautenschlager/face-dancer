@@ -1,0 +1,309 @@
+{
+  "$defs": {
+    "ApplyDelta": {
+      "description": "Authoritative change the character's code applies (session -> character).\n\nShares ``correlation_id`` with the ``propose_delta`` it finalizes.",
+      "properties": {
+        "type": {
+          "const": "apply_delta",
+          "default": "apply_delta",
+          "title": "Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "message_id": {
+          "format": "uuid",
+          "title": "Message Id",
+          "type": "string"
+        },
+        "correlation_id": {
+          "format": "uuid",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "effects": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Effects",
+          "type": "array"
+        }
+      },
+      "required": [
+        "correlation_id",
+        "target"
+      ],
+      "title": "ApplyDelta",
+      "type": "object"
+    },
+    "Contest": {
+      "description": "Character-surfaced claims, not verdicts (character -> session).",
+      "properties": {
+        "type": {
+          "const": "contest",
+          "default": "contest",
+          "title": "Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "message_id": {
+          "format": "uuid",
+          "title": "Message Id",
+          "type": "string"
+        },
+        "correlation_id": {
+          "format": "uuid",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "claims": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Claims",
+          "type": "array"
+        }
+      },
+      "required": [
+        "correlation_id"
+      ],
+      "title": "Contest",
+      "type": "object"
+    },
+    "Intent": {
+      "description": "Character-side opener; the session adjudicates it into a propose_delta.",
+      "properties": {
+        "type": {
+          "const": "intent",
+          "default": "intent",
+          "title": "Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "message_id": {
+          "format": "uuid",
+          "title": "Message Id",
+          "type": "string"
+        },
+        "correlation_id": {
+          "format": "uuid",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "action": {
+          "title": "Action",
+          "type": "string"
+        }
+      },
+      "required": [
+        "correlation_id",
+        "action"
+      ],
+      "title": "Intent",
+      "type": "object"
+    },
+    "ProposeDelta": {
+      "description": "Session-proposed change, not yet committed (session -> character).",
+      "properties": {
+        "type": {
+          "const": "propose_delta",
+          "default": "propose_delta",
+          "title": "Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "message_id": {
+          "format": "uuid",
+          "title": "Message Id",
+          "type": "string"
+        },
+        "correlation_id": {
+          "format": "uuid",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "tags": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Tags",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "effects": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Effects",
+          "type": "array"
+        }
+      },
+      "required": [
+        "correlation_id",
+        "target"
+      ],
+      "title": "ProposeDelta",
+      "type": "object"
+    },
+    "RequestRoll": {
+      "description": "A save or check to resolve (session -> character). DC is session-owned.",
+      "properties": {
+        "type": {
+          "const": "request_roll",
+          "default": "request_roll",
+          "title": "Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "message_id": {
+          "format": "uuid",
+          "title": "Message Id",
+          "type": "string"
+        },
+        "correlation_id": {
+          "format": "uuid",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "dc": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dc"
+        }
+      },
+      "required": [
+        "correlation_id",
+        "kind"
+      ],
+      "title": "RequestRoll",
+      "type": "object"
+    },
+    "RollResult": {
+      "description": "A rolled result; total == natural + modifier, computed in code elsewhere.",
+      "properties": {
+        "type": {
+          "const": "roll_result",
+          "default": "roll_result",
+          "title": "Type",
+          "type": "string"
+        },
+        "schema_version": {
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "message_id": {
+          "format": "uuid",
+          "title": "Message Id",
+          "type": "string"
+        },
+        "correlation_id": {
+          "format": "uuid",
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "natural": {
+          "title": "Natural",
+          "type": "integer"
+        },
+        "modifier": {
+          "title": "Modifier",
+          "type": "integer"
+        },
+        "total": {
+          "title": "Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "correlation_id",
+        "natural",
+        "modifier",
+        "total"
+      ],
+      "title": "RollResult",
+      "type": "object"
+    }
+  },
+  "discriminator": {
+    "mapping": {
+      "apply_delta": "#/$defs/ApplyDelta",
+      "contest": "#/$defs/Contest",
+      "intent": "#/$defs/Intent",
+      "propose_delta": "#/$defs/ProposeDelta",
+      "request_roll": "#/$defs/RequestRoll",
+      "roll_result": "#/$defs/RollResult"
+    },
+    "propertyName": "type"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/ProposeDelta"
+    },
+    {
+      "$ref": "#/$defs/ApplyDelta"
+    },
+    {
+      "$ref": "#/$defs/Contest"
+    },
+    {
+      "$ref": "#/$defs/Intent"
+    },
+    {
+      "$ref": "#/$defs/RequestRoll"
+    },
+    {
+      "$ref": "#/$defs/RollResult"
+    }
+  ]
+}
