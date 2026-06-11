@@ -22,12 +22,22 @@ from face_dancer.protocol.messages import (
 )
 from face_dancer.protocol.validation import export_schema, validate
 from face_dancer.protocol.version import SCHEMA_VERSION
+from face_dancer.protocol.vocabulary import (
+    CONDITIONS,
+    DAMAGE_TYPES,
+    STARTER_TAGS,
+    EffectOp,
+)
 
 __all__ = [
+    "CONDITIONS",
+    "DAMAGE_TYPES",
     "MESSAGE_TYPES",
     "SCHEMA_VERSION",
+    "STARTER_TAGS",
     "ApplyDelta",
     "Contest",
+    "EffectOp",
     "Envelope",
     "Intent",
     "Message",
