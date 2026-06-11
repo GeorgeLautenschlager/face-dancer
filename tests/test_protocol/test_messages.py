@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 import pytest
 
+from face_dancer.protocol.delta import Delta
 from face_dancer.protocol.messages import (
     MESSAGE_TYPES,
     ApplyDelta,
@@ -15,6 +16,7 @@ from face_dancer.protocol.messages import (
     RollResult,
 )
 from face_dancer.protocol.version import SCHEMA_VERSION
+from face_dancer.protocol.vocabulary import EffectOp
 
 
 def _one_of_each() -> list[Any]:
@@ -22,15 +24,11 @@ def _one_of_each() -> list[Any]:
     return [
         ProposeDelta(
             correlation_id=cid,
-            target="self",
-            tags=frozenset({"fire"}),
-            effects=[{"op": "reduce", "amount": 8}],
+            delta=Delta(op=EffectOp.REDUCE, tags=frozenset({"fire"}), payload={"amount": 8}),
         ),
         ApplyDelta(
             correlation_id=cid,
-            target="self",
-            tags=frozenset({"fire"}),
-            effects=[{"op": "reduce", "amount": 4}],
+            delta=Delta(op=EffectOp.REDUCE, tags=frozenset({"fire"}), payload={"amount": 4}),
         ),
         Contest(correlation_id=cid, claims=["I have fire resistance and a save"]),
         Intent(correlation_id=uuid4(), action="I drink the potion"),
