@@ -8,6 +8,7 @@ import pytest
 from face_dancer.bundle.container import Bundle
 from face_dancer.bundle.errors import BundleError, BundleVersionError
 from face_dancer.bundle.version import BUNDLE_SCHEMA_VERSION
+from face_dancer.state import DynamicState
 
 
 @pytest.mark.parametrize("name", ["Test Character", "Another One"])
@@ -18,7 +19,7 @@ def test_construction(name: str) -> None:
     assert isinstance(bundle.character_id, UUID)
     assert bundle.bundle_version == BUNDLE_SCHEMA_VERSION
     assert bundle.sheet == {}
-    assert bundle.state == {}
+    assert bundle.state == DynamicState()
     assert bundle.rider == {}
 
     # Ensure different bundles get different IDs
@@ -44,7 +45,7 @@ def test_construction_with_values() -> None:
     assert bundle.character_id == char_id
     assert bundle.name == name
     assert bundle.sheet == sheet
-    assert bundle.state == state
+    assert bundle.state == DynamicState(hp=50)
     assert bundle.rider == rider
 
 
@@ -60,7 +61,7 @@ def test_round_trip_populated() -> None:
     original = Bundle(
         name="Populated",
         sheet={"attr": 1},
-        state={"val": 2},
+        state={"hp": 7, "conditions": ["prone"]},
         rider={"rule": 3},
     )
     serialized = original.serialize()
@@ -113,3 +114,20 @@ def test_deserialize_errors() -> None:
     # Not a dictionary
     with pytest.raises(BundleError):
         Bundle.deserialize("[]")
+
+
+def test_state_survives_load_play_unload_reload(tmp_path: Path) -> None:
+    # AC3: load -> play (code mutates state) -> unload -> reload yields identical state.
+    bundle = Bundle(name="Fighter")
+    bundle.state.hp = 18
+    bundle.state.conditions.add("prone")
+    bundle.state.resources["second_wind"] = 1
+
+    path = tmp_path / "char.json"
+    bundle.unload(path)
+    reloaded = Bundle.load(path)
+
+    assert reloaded.state == bundle.state
+    assert reloaded.state.hp == 18
+    assert "prone" in reloaded.state.conditions
+    assert reloaded.state.resources["second_wind"] == 1
