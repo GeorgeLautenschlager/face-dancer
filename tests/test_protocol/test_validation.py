@@ -61,3 +61,16 @@ def test_validate_wraps_bad_body_as_protocol_error() -> None:
     raw = {"type": "intent", "correlation_id": str(uuid4())}
     with pytest.raises(ProtocolError):
         validate(raw)
+
+
+def test_validate_wraps_malformed_json() -> None:
+    with pytest.raises(ProtocolError) as excinfo:
+        validate("{not json")
+    assert "malformed JSON" in str(excinfo.value)
+
+
+def test_validate_rejects_non_dict_json() -> None:
+    # This covers the non-dict guard for both dict and string inputs
+    with pytest.raises(ProtocolError) as excinfo:
+        validate("[1, 2, 3]")
+    assert "expected a message object" in str(excinfo.value)

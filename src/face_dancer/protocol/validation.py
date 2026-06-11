@@ -26,7 +26,14 @@ def validate(raw: dict[str, Any] | str) -> Message:
     for an unrecognised discriminator, ``SchemaVersionError`` for a version
     mismatch, and ``ProtocolError`` for a structurally invalid body.
     """
-    data = json.loads(raw) if isinstance(raw, str) else raw
+    if isinstance(raw, str):
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise ProtocolError(f"malformed JSON: {exc}") from exc
+    else:
+        data = raw
+
     if not isinstance(data, dict):
         raise ProtocolError(f"expected a message object, got {type(data).__name__}")
 
