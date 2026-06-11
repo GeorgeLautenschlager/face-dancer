@@ -72,3 +72,26 @@ def test_message_types_registry_has_all_six() -> None:
         RequestRoll,
         RollResult,
     }
+
+
+def test_public_api_is_reexported() -> None:
+    import face_dancer.protocol as protocol
+
+    for name in (
+        "Message",
+        "Envelope",
+        "ProposeDelta",
+        "ApplyDelta",
+        "Contest",
+        "Intent",
+        "RequestRoll",
+        "RollResult",
+        "MESSAGE_TYPES",
+        "SCHEMA_VERSION",
+        "validate",
+        "export_schema",
+        "ProtocolError",
+        "SchemaVersionError",
+        "UnknownMessageType",
+    ):
+        assert hasattr(protocol, name), f"protocol package does not re-export {name}"
