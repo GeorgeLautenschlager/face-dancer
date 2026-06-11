@@ -9,7 +9,14 @@ from face_dancer.protocol.errors import (
     SchemaVersionError,
     UnknownMessageType,
 )
-from face_dancer.protocol.messages import Intent, ProposeDelta
+from face_dancer.protocol.messages import (
+    ApplyDelta,
+    Contest,
+    Intent,
+    ProposeDelta,
+    RequestRoll,
+    RollResult,
+)
 from face_dancer.protocol.validation import validate
 from face_dancer.protocol.version import SCHEMA_VERSION
 
@@ -74,3 +81,19 @@ def test_validate_rejects_non_dict_json() -> None:
     with pytest.raises(ProtocolError) as excinfo:
         validate("[1, 2, 3]")
     assert "expected a message object" in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    "msg",
+    [
+        ProposeDelta(correlation_id=uuid4(), target="self", tags=frozenset({"fire"})),
+        ApplyDelta(correlation_id=uuid4(), target="self"),
+        Contest(correlation_id=uuid4(), claims=["I have fire resistance"]),
+        Intent(correlation_id=uuid4(), action="I drink the potion"),
+        RequestRoll(correlation_id=uuid4(), kind="saving_throw", dc=15),
+        RollResult(correlation_id=uuid4(), natural=12, modifier=3, total=15),
+    ],
+)
+def test_validate_round_trips_every_message_type(msg) -> None:
+    assert validate(msg.model_dump()) == msg
+    assert validate(msg.model_dump_json()) == msg
