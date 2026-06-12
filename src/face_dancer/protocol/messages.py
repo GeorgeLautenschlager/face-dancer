@@ -38,10 +38,18 @@ class Contest(Envelope):
 
 
 class Intent(Envelope):
-    """Character-side opener; the session adjudicates it into a propose_delta."""
+    """Character-side opener; the session adjudicates it into a propose_delta.
+
+    ``action`` and ``target`` are the simple, host-understood contract the session
+    reads and adjudicates; the character names a target but never asserts its
+    legality (affordance is session-owned). ``narration`` is optional in-character
+    flair the session may render but never parses for mechanics.
+    """
 
     type: Literal["intent"] = "intent"
     action: str
+    target: str | None = None
+    narration: str | None = None
 
 
 class RequestRoll(Envelope):
