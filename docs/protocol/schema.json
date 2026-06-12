@@ -114,7 +114,7 @@
       "type": "string"
     },
     "Intent": {
-      "description": "Character-side opener; the session adjudicates it into a propose_delta.",
+      "description": "Character-side opener; the session adjudicates it into a propose_delta.\n\n``action`` and ``target`` are the simple, host-understood contract the session\nreads and adjudicates; the character names a target but never asserts its\nlegality (affordance is session-owned). ``narration`` is optional in-character\nflair the session may render but never parses for mechanics.",
       "properties": {
         "type": {
           "const": "intent",
@@ -140,6 +140,30 @@
         "action": {
           "title": "Action",
           "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target"
+        },
+        "narration": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Narration"
         }
       },
       "required": [
