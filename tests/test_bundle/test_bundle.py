@@ -8,6 +8,7 @@ import pytest
 from face_dancer.bundle.container import Bundle
 from face_dancer.bundle.errors import BundleError, BundleVersionError
 from face_dancer.bundle.version import BUNDLE_SCHEMA_VERSION
+from face_dancer.sheet import Sheet
 from face_dancer.state import DynamicState
 
 
@@ -18,7 +19,7 @@ def test_construction(name: str) -> None:
     assert bundle.name == name
     assert isinstance(bundle.character_id, UUID)
     assert bundle.bundle_version == BUNDLE_SCHEMA_VERSION
-    assert bundle.sheet == {}
+    assert bundle.sheet == Sheet()
     assert bundle.state == DynamicState()
     assert bundle.rider == {}
 
@@ -30,7 +31,7 @@ def test_construction(name: str) -> None:
 def test_construction_with_values() -> None:
     char_id = uuid4()
     name = "Test Character"
-    sheet = {"strength": 10}
+    sheet = {"stats": {"strength": 10}}
     state = {"hp": 50}
     rider = {"rules": "no dice"}
 
@@ -44,7 +45,7 @@ def test_construction_with_values() -> None:
 
     assert bundle.character_id == char_id
     assert bundle.name == name
-    assert bundle.sheet == sheet
+    assert bundle.sheet == Sheet(stats={"strength": 10})
     assert bundle.state == DynamicState(hp=50)
     assert bundle.rider == rider
 
@@ -60,7 +61,7 @@ def test_round_trip_empty() -> None:
 def test_round_trip_populated() -> None:
     original = Bundle(
         name="Populated",
-        sheet={"attr": 1},
+        sheet={"stats": {"attr": 1}},
         state={"hp": 7, "conditions": ["prone"]},
         rider={"rule": 3},
     )
@@ -71,7 +72,7 @@ def test_round_trip_populated() -> None:
 
 
 def test_load_unload_reload(tmp_path: Path) -> None:
-    original = Bundle(name="Persistence Test", sheet={"a": 1})
+    original = Bundle(name="Persistence Test", sheet={"stats": {"a": 1}})
     path = tmp_path / "char.json"
 
     # unload (persist)
