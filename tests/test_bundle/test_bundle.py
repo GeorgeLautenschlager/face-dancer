@@ -8,6 +8,7 @@ import pytest
 from face_dancer.bundle.container import Bundle
 from face_dancer.bundle.errors import BundleError, BundleVersionError
 from face_dancer.bundle.version import BUNDLE_SCHEMA_VERSION
+from face_dancer.rider import Clause, Rider, Trigger
 from face_dancer.sheet import Sheet
 from face_dancer.state import DynamicState
 
@@ -21,7 +22,7 @@ def test_construction(name: str) -> None:
     assert bundle.bundle_version == BUNDLE_SCHEMA_VERSION
     assert bundle.sheet == Sheet()
     assert bundle.state == DynamicState()
-    assert bundle.rider == {}
+    assert bundle.rider == Rider()
 
     # Ensure different bundles get different IDs
     bundle2 = Bundle(name=name)
@@ -33,7 +34,16 @@ def test_construction_with_values() -> None:
     name = "Test Character"
     sheet = {"stats": {"strength": 10}}
     state = {"hp": 50}
-    rider = {"rules": "no dice"}
+    rider = Rider(
+        clauses=[
+            Clause(
+                claim="I resist fire",
+                trigger=Trigger(tags=frozenset({"fire"})),
+                kind="mechanical",
+                source="homebrew",
+            )
+        ]
+    )
 
     bundle = Bundle(
         character_id=char_id,
@@ -63,7 +73,16 @@ def test_round_trip_populated() -> None:
         name="Populated",
         sheet={"stats": {"attr": 1}},
         state={"hp": 7, "conditions": ["prone"]},
-        rider={"rule": 3},
+        rider={
+            "clauses": [
+                {
+                    "claim": "x",
+                    "trigger": {"tags": ["fire"]},
+                    "kind": "mechanical",
+                    "source": "phb",
+                }
+            ]
+        },
     )
     serialized = original.serialize()
     rebuilt = Bundle.deserialize(serialized)

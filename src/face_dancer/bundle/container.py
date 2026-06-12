@@ -1,12 +1,12 @@
 import json
 from pathlib import Path
-from typing import Any
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field, ValidationError
 
 from face_dancer.bundle.errors import BundleError, BundleVersionError
 from face_dancer.bundle.version import BUNDLE_SCHEMA_VERSION
+from face_dancer.rider import Rider
 from face_dancer.sheet import Sheet
 from face_dancer.state import DynamicState
 
@@ -17,7 +17,7 @@ class Bundle(BaseModel):
     bundle_version: int = BUNDLE_SCHEMA_VERSION
     sheet: Sheet = Field(default_factory=Sheet)
     state: DynamicState = Field(default_factory=DynamicState)
-    rider: dict[str, Any] = Field(default_factory=dict)
+    rider: Rider = Field(default_factory=Rider)
 
     def serialize(self) -> str:
         """Return the JSON representation of this bundle."""
