@@ -5,3 +5,7 @@ Tactical choices (targeting, movement) are separated from expressive choices
 persistent drives (persona), situational objectives (scene-level), and
 tactical intent (per turn).
 """
+
+from face_dancer.decision.goals import Goals
+
+__all__ = ["Goals"]
