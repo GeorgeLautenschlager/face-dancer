@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from face_dancer.bundle.errors import BundleError, BundleVersionError
 from face_dancer.bundle.version import BUNDLE_SCHEMA_VERSION
+from face_dancer.sheet import Sheet
 from face_dancer.state import DynamicState
 
 
@@ -14,7 +15,7 @@ class Bundle(BaseModel):
     character_id: UUID = Field(default_factory=uuid4)
     name: str
     bundle_version: int = BUNDLE_SCHEMA_VERSION
-    sheet: dict[str, Any] = Field(default_factory=dict)
+    sheet: Sheet = Field(default_factory=Sheet)
     state: DynamicState = Field(default_factory=DynamicState)
     rider: dict[str, Any] = Field(default_factory=dict)
 
