@@ -1,5 +1,7 @@
 """Tests for the decision policy: tactical heuristic + expressive routing."""
 
+from uuid import uuid4
+
 import pytest
 
 from face_dancer.capability import Capability
@@ -69,3 +71,18 @@ def test_public_api_is_reexported() -> None:
 
     for name in ("DecisionPolicy", "Candidate", "Scorer", "Goals"):
         assert hasattr(decision, name)
+
+
+def test_expressive_routes_through_the_gateway() -> None:
+    canned = Intent(correlation_id=uuid4(), action="parley", narration="bows low")
+    policy = DecisionPolicy(gateway=NullModelGateway(response=canned))
+    with recorded_model_calls() as rec:
+        result = policy.choose_expressive(Scene(), [_FIREBALL], Goals())
+    assert result == canned
+    assert [c.path for c in rec.calls] == ["decision.expressive"]
+
+
+def test_expressive_rejects_a_non_intent_response() -> None:
+    policy = DecisionPolicy(gateway=NullModelGateway(response="not an intent"))
+    with pytest.raises(TypeError):
+        policy.choose_expressive(Scene(), [_FIREBALL], Goals())

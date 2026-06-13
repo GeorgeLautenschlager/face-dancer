@@ -19,6 +19,15 @@ class Candidate:
     target: str | None = None
 
 
+@dataclass(frozen=True)
+class ExpressiveRequest:
+    """The opaque request handed to the model on the expressive path (adapter-owned)."""
+
+    scene: Scene
+    capabilities: tuple[Capability, ...]
+    goals: Goals
+
+
 Scorer = Callable[[Candidate, Scene, Goals], float]
 
 
@@ -41,3 +50,13 @@ class DecisionPolicy:
         with model_calls_forbidden("tactical decision is code-only"):
             best = max(candidates, key=lambda c: self._score(c, scene, goals))
         return best.capability.to_intent(correlation_id=uuid4(), target=best.target)
+
+    def choose_expressive(
+        self, scene: Scene, capabilities: list[Capability], goals: Goals
+    ) -> Intent:
+        """Route an expressive decision through the model gateway; return its intent."""
+        request = ExpressiveRequest(scene=scene, capabilities=tuple(capabilities), goals=goals)
+        result = self._gateway.invoke("decision.expressive", request)
+        if not isinstance(result, Intent):
+            raise TypeError(f"expressive gateway returned {type(result).__name__}, expected Intent")
+        return result
