@@ -7,5 +7,6 @@ tactical intent (per turn).
 """
 
 from face_dancer.decision.goals import Goals
+from face_dancer.decision.policy import Candidate, DecisionPolicy, Scorer
 
-__all__ = ["Goals"]
+__all__ = ["Candidate", "DecisionPolicy", "Goals", "Scorer"]
