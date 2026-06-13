@@ -4,6 +4,7 @@ from uuid import uuid4
 
 import pytest
 
+from face_dancer.protocol.contest import Claim
 from face_dancer.protocol.delta import Delta
 from face_dancer.protocol.errors import (
     ProtocolError,
@@ -93,7 +94,7 @@ def test_validate_rejects_non_dict_json() -> None:
             delta=Delta(op=EffectOp.REDUCE, tags=frozenset({"fire"})),
         ),
         ApplyDelta(correlation_id=uuid4(), delta=Delta(op=EffectOp.REDUCE)),
-        Contest(correlation_id=uuid4(), claims=["I have fire resistance"]),
+        Contest(correlation_id=uuid4(), claims=[Claim(claim="I have fire resistance")]),
         Intent(correlation_id=uuid4(), action="I drink the potion"),
         RequestRoll(correlation_id=uuid4(), kind="saving_throw", dc=15),
         RollResult(correlation_id=uuid4(), natural=12, modifier=3, total=15),

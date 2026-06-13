@@ -9,6 +9,7 @@ from typing import Annotated, Literal, get_args
 
 from pydantic import Field
 
+from face_dancer.protocol.contest import Claim
 from face_dancer.protocol.delta import Delta
 from face_dancer.protocol.envelope import Envelope
 
@@ -34,7 +35,7 @@ class Contest(Envelope):
     """Character-surfaced claims, not verdicts (character -> session)."""
 
     type: Literal["contest"] = "contest"
-    claims: list[str] = Field(default_factory=list)
+    claims: list[Claim] = Field(default_factory=list)
 
 
 class Intent(Envelope):

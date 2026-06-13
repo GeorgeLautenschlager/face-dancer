@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 import pytest
 
+from face_dancer.protocol.contest import Claim
 from face_dancer.protocol.delta import Delta
 from face_dancer.protocol.messages import (
     MESSAGE_TYPES,
@@ -30,7 +31,7 @@ def _one_of_each() -> list[Any]:
             correlation_id=cid,
             delta=Delta(op=EffectOp.REDUCE, tags=frozenset({"fire"}), payload={"amount": 4}),
         ),
-        Contest(correlation_id=cid, claims=["I have fire resistance and a save"]),
+        Contest(correlation_id=cid, claims=[Claim(claim="I have fire resistance and a save")]),
         Intent(correlation_id=uuid4(), action="I drink the potion"),
         RequestRoll(correlation_id=cid, kind="saving_throw", dc=15),
         RollResult(correlation_id=cid, natural=12, modifier=3, total=15),
