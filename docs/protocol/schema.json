@@ -35,6 +35,49 @@
       "title": "ApplyDelta",
       "type": "object"
     },
+    "Claim": {
+      "description": "One surfaced rule, ~ a matched rider clause: prose plus an optional effect.\n\n``claim`` is the mandatory prose a dumb host reads; ``effect`` is the optional\nstructured enhancement a host can mechanize. A claim-only Claim is valid.",
+      "properties": {
+        "claim": {
+          "title": "Claim",
+          "type": "string"
+        },
+        "effect": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClaimEffect"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "claim"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "ClaimEffect": {
+      "description": "A structured suggestion a claim may carry \u2014 an op + payload, never a verdict.\n\nMirrors the rider's RiderEffect (op from the closed vocabulary, open payload,\nno tags). The session adjudicates it; the contest never asserts a final number.",
+      "properties": {
+        "op": {
+          "$ref": "#/$defs/EffectOp"
+        },
+        "payload": {
+          "additionalProperties": true,
+          "title": "Payload",
+          "type": "object"
+        }
+      },
+      "required": [
+        "op"
+      ],
+      "title": "ClaimEffect",
+      "type": "object"
+    },
     "Contest": {
       "description": "Character-surfaced claims, not verdicts (character -> session).",
       "properties": {
@@ -61,7 +104,7 @@
         },
         "claims": {
           "items": {
-            "type": "string"
+            "$ref": "#/$defs/Claim"
           },
           "title": "Claims",
           "type": "array"
