@@ -65,32 +65,28 @@ Field`):
 from pydantic import Field, model_validator
 ```
 
-`RequestRoll` is unchanged in shape (the #4 decision is already structural — one
-session-owned `dc`, no character DC):
+`RequestRoll` is **entirely unchanged** — the #4 decision is already structural
+(one session-owned `dc`, no character DC), and its docstring already states it.
+**Its docstring must not change**, because pydantic emits the class docstring as
+the schema `description`, and changing it would drift `schema.json`. The #4 "no
+character DC" guarantee is added as a *test* (the field-set guard), not a code
+edit:
 
 ```python
 class RequestRoll(Envelope):
-    """A save or check to resolve (session -> character).
-
-    The DC is session-owned: ``dc`` is supplied by the session (``None`` when it
-    withholds the DC — "roll, I'll tell you if you make it"). There is no
-    character-asserted-DC field; the character never asserts a DC (issue #4).
-    """
+    """A save or check to resolve (session -> character). DC is session-owned."""
 
     type: Literal["request_roll"] = "request_roll"
     kind: str
     dc: int | None = None
 ```
 
-`RollResult` gains the total validator:
+`RollResult` gains the total validator. **Its docstring is left unchanged** (same
+schema-stability reason); only the validator method is added:
 
 ```python
 class RollResult(Envelope):
-    """A rolled result; total == natural + modifier, computed in code (issue #20).
-
-    The validator rejects any result whose ``total`` is inconsistent, so no path —
-    not even a model authoring the message — can carry a faked total.
-    """
+    """A rolled result; total == natural + modifier, computed in code elsewhere."""
 
     type: Literal["roll_result"] = "roll_result"
     natural: int
@@ -107,6 +103,8 @@ class RollResult(Envelope):
 ```
 
 The other message types, the `Message` union, and `MESSAGE_TYPES` are unchanged.
+Adding a `model_validator` does not change the JSON Schema (validators are not
+reflected in it), and the docstrings are untouched, so `schema.json` is unchanged.
 
 ## Testing
 
