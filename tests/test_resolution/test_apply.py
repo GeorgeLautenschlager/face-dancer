@@ -61,3 +61,21 @@ def test_public_api_is_reexported() -> None:
 
     assert hasattr(resolution, "apply")
     assert hasattr(resolution, "ApplyError")
+
+
+def test_replace_hp_sets_the_value() -> None:
+    state = DynamicState(hp=20)
+    apply(_msg(EffectOp.REPLACE, {"target": "hp", "value": 7}), state)
+    assert state.hp == 7
+
+
+def test_replace_position_sets_the_blob() -> None:
+    state = DynamicState()
+    apply(_msg(EffectOp.REPLACE, {"target": "position", "value": {"zone": "bridge"}}), state)
+    assert state.position == {"zone": "bridge"}
+
+
+def test_replace_resource_sets_the_key() -> None:
+    state = DynamicState(resources={"ki": 3})
+    apply(_msg(EffectOp.REPLACE, {"target": "resources", "key": "ki", "value": 1}), state)
+    assert state.resources["ki"] == 1

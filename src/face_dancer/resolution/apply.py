@@ -28,8 +28,22 @@ def _reduce(state: DynamicState, payload: dict[str, Any]) -> None:
         raise ApplyError(f"reduce: unknown target {target!r}")
 
 
+def _replace(state: DynamicState, payload: dict[str, Any]) -> None:
+    target = payload["target"]
+    value = payload["value"]
+    if target == "hp":
+        state.hp = value
+    elif target == "position":
+        state.position = value
+    elif target == "resources":
+        state.resources[payload["key"]] = value
+    else:
+        raise ApplyError(f"replace: unknown target {target!r}")
+
+
 _HANDLERS: dict[EffectOp, Callable[[DynamicState, dict[str, Any]], None]] = {
     EffectOp.REDUCE: _reduce,
+    EffectOp.REPLACE: _replace,
 }
 
 
@@ -40,6 +54,10 @@ def _apply(delta: Delta, state: DynamicState) -> DynamicState:
     try:
         handler(state, delta.payload)
     except KeyError as exc:
+        # The only KeyError source in the v0 handlers is the intended payload[...]
+        # reads (state writes are attribute sets / dict __setitem__, which don't
+        # raise KeyError). A future handler that *reads* from a dict must guard
+        # its own lookups rather than let them masquerade as a missing field.
         raise ApplyError(f"{delta.op.value!r} payload missing field {exc}") from exc
     return state
 
