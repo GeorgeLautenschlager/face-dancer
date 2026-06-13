@@ -42,3 +42,22 @@ def test_public_api_is_reexported() -> None:
 
     assert hasattr(protocol, "Claim")
     assert hasattr(protocol, "ClaimEffect")
+
+
+def test_contest_round_trips_through_validate() -> None:
+    from uuid import uuid4
+
+    from face_dancer.protocol import Contest, validate
+
+    msg = Contest(
+        correlation_id=uuid4(),
+        claims=[
+            Claim(claim="I have fire resistance and a save"),
+            Claim(
+                claim="Half damage",
+                effect=ClaimEffect(op=EffectOp.SCALE, payload={"factor": 0.5}),
+            ),
+        ],
+    )
+    assert validate(msg.model_dump()) == msg
+    assert validate(msg.model_dump_json()) == msg
