@@ -3,3 +3,7 @@
 World-acts-on-character and character-acts-on-world both resolve through this loop.
 An intent adjudicates into a propose_delta and then follows the same path.
 """
+
+from face_dancer.resolution.apply import ApplyError, apply
+
+__all__ = ["ApplyError", "apply"]
