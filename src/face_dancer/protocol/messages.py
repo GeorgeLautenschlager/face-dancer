@@ -7,7 +7,7 @@ derived from the union so it can never drift.
 
 from typing import Annotated, Literal, get_args
 
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from face_dancer.protocol.contest import Claim
 from face_dancer.protocol.delta import Delta
@@ -68,6 +68,14 @@ class RollResult(Envelope):
     natural: int
     modifier: int
     total: int
+
+    @model_validator(mode="after")
+    def _total_is_consistent(self) -> "RollResult":
+        if self.total != self.natural + self.modifier:
+            raise ValueError(
+                f"total {self.total} != natural {self.natural} + modifier {self.modifier}"
+            )
+        return self
 
 
 Message = Annotated[
