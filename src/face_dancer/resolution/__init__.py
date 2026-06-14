@@ -5,6 +5,14 @@ An intent adjudicates into a propose_delta and then follows the same path.
 """
 
 from face_dancer.resolution.apply import ApplyError, apply
+from face_dancer.resolution.loop import ResolutionError, ResolutionLoop, Session
 from face_dancer.resolution.roll import roll
 
-__all__ = ["ApplyError", "apply", "roll"]
+__all__ = [
+    "ApplyError",
+    "ResolutionError",
+    "ResolutionLoop",
+    "Session",
+    "apply",
+    "roll",
+]
